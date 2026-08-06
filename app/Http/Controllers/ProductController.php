@@ -11,6 +11,16 @@ class ProductController extends Controller
 {
     public function search(Request $request)
     {
+        // Your existing search logic...
+    $searchTerm = $request->input('search');
+    $locationFilter = $request->input('location');
+    
+    // Add these two lines to fetch the live counts
+    $productsCount = Product::count();
+    $vendorCount = Vendor::count(); // Or Store::count() depending on your model name
+
+    // Pass them into the view compact array
+    return view('search', compact('productsCount', 'vendorCount', 'searchTerm', 'locationFilter' /* plus any other variables you already pass */));
         // 1. Load products with vendors, ensuring we can access pivot data
         $query = Product::query()
             ->with(['vendors' => function($q) {

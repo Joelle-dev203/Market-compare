@@ -219,10 +219,10 @@
 
             <!-- Trust Badges -->
             <div class="flex flex-wrap justify-center gap-6 mt-8 text-white/80 text-sm">
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> 20+ Products</span>
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> 30+ Stores</span>
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> Best Price Guarantee</span>
-            </div>
+    <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> {{ \App\Models\Product::count() }}+ Products</span>
+<span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> {{ \App\Models\Vendor::count() }}+ vendor</span>
+    <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> Best Price Guarantee</span>
+</div>
         </div>
     </section>
 
