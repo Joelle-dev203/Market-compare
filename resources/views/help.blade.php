@@ -21,70 +21,94 @@
 <body class="bg-gray-50 font-sans antialiased" x-data="{ mobileMenu: false }">
 
     <!-- ===== HEADER (STICKY) ===== -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ route('product.search') }}" class="text-2xl font-bold text-emerald-600 tracking-tight">
-                PriceCheck<span class="text-amber-500">Cameroon</span>
-            </a>
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="{{ route('product.search') }}" class="text-2xl font-bold text-emerald-600 tracking-tight">
+            PriceCheck<span class="text-amber-500">Cameroon</span>
+        </a>
+        
+        <div class="hidden md:flex items-center space-x-6">
+            <!-- 1. WISHLIST: Only shows when logged in -->
+            @auth
+                <a href="{{ route('wishlist.index') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">
+                    <i class="fas fa-heart mr-1"></i> My Wishlist
+                </a>
+            @endauth
+
+            <!-- 2. USER ACTIONS (Login/Logout/Register) -->
+            @auth
+                <span class="text-sm font-semibold text-gray-700">Hi, {{ Auth::user()->name }}</span>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-sm font-bold text-red-500 hover:text-red-700 transition">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('register') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">
+                    <i class="fas fa-heart mr-1"></i> My Wishlist
+                </a>
+                <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">Login</a>
+            @endauth
+
+            <!-- 3. VENDOR & ABOUT -->
+            @if(Auth::guard('vendor')->check())
+                <a href="{{ route('vendor.dashboard') }}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-800 transition">Dashboard</a>
+            @else
+                <a href="{{ route('vendor.register.form') }}" class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm">
+                    <i class="fas fa-store mr-2"></i>Register Business
+                </a>
+            @endif
             
-            <div class="hidden md:flex items-center space-x-6">
-                <!-- Wishlist -->
-                @auth
-                    <a href="{{ route('wishlist.index') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">
-                        <i class="fas fa-heart mr-1"></i> My Wishlist
-                    </a>
-                @endauth
-
-                <!-- User Actions -->
-                @auth
-                    <span class="text-sm font-semibold text-gray-700">Hi, {{ Auth::user()->name }}</span>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="text-sm font-bold text-red-500 hover:text-red-700 transition">Logout</button>
-                    </form>
-                @else
-                    <a href="{{ route('register') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">
-                        <i class="fas fa-heart mr-1"></i> My Wishlist
-                    </a>
-                    <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">Login</a>
-                @endauth
-
-                <!-- Vendor -->
-                @if(Auth::guard('vendor')->check())
-                    <a href="{{ route('vendor.dashboard') }}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-800 transition">Dashboard</a>
-                @else
-                    <a href="{{ route('vendor.register.form') }}" class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm">
-                        <i class="fas fa-store mr-2"></i>Register Shop
-                    </a>
-                @endif
-                
-                <a href="{{ route('about') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">About</a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition">
-                <i class="fas fa-bars text-gray-700 text-xl"></i>
-            </button>
+            <a href="{{ route('about') }}" class="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition">About</a>
         </div>
 
-        <!-- Mobile Menu -->
-        <div x-show="mobileMenu" x-cloak class="md:hidden bg-white border-t border-gray-100 py-4 px-4">
-            <div class="flex flex-col space-y-3">
-                <a href="{{ route('product.search') }}" class="text-gray-700 hover:text-emerald-600 font-medium">Home</a>
-                <a href="{{ route('about') }}" class="text-gray-700 hover:text-emerald-600 font-medium">About</a>
-                <a href="{{ route('vendor.register.form') }}" class="text-emerald-600 font-medium">Sell</a>
-                @auth
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-red-500 font-medium text-left w-full">Logout</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-emerald-600 font-medium">Login</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+        <!-- Mobile Menu Button -->
+        <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition">
+            <i class="fas fa-bars text-gray-700 text-xl"></i>
+        </button>
+    </div>
 
+    <!-- Mobile Menu - Same as Desktop -->
+    <div x-show="mobileMenu" x-cloak class="md:hidden bg-white border-t border-gray-100 py-4 px-4">
+        <div class="flex flex-col space-y-3">
+            <!-- Home -->
+            <a href="{{ route('product.search') }}" class="text-gray-700 hover:text-emerald-600 font-medium">Home</a>
+            
+            <!-- Wishlist -->
+            @auth
+                <a href="{{ route('wishlist.index') }}" class="text-gray-700 hover:text-emerald-600 font-medium">
+                    <i class="fas fa-heart mr-2 text-red-500"></i> My Wishlist
+                </a>
+            @else
+                <a href="{{ route('register') }}" class="text-gray-700 hover:text-emerald-600 font-medium">
+                    <i class="fas fa-heart mr-2"></i> My Wishlist
+                </a>
+            @endauth
+
+            <!-- Auth Links -->
+            @auth
+                <span class="text-sm font-semibold text-gray-700">Hi, {{ Auth::user()->name }}</span>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="text-red-500 font-medium text-left hover:text-red-700 transition">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="text-gray-700 hover:text-emerald-600 font-medium">Login</a>
+            @endauth
+
+            <!-- Vendor -->
+            @if(Auth::guard('vendor')->check())
+                <a href="{{ route('vendor.dashboard') }}" class="text-emerald-600 font-medium">Dashboard</a>
+            @else
+                <a href="{{ route('vendor.register.form') }}" class="flex items-center text-emerald-600 font-medium">
+                    <i class="fas fa-store mr-2"></i>Register Business
+                </a>
+            @endif
+            
+            <!-- About -->
+            <a href="{{ route('about') }}" class="text-gray-700 hover:text-emerald-600 font-medium">About</a>
+        </div>
+    </div>
+</header>
     <!-- ===== CATEGORY NAV (STICKY) ===== -->
     <nav class="bg-gray-900 text-white py-3 shadow-md sticky top-16 z-40" x-data="{ open: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center space-x-8">
