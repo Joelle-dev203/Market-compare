@@ -10,51 +10,57 @@ use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
     public function search(Request $request)
-    {
-        // Your existing search logic...
-    $searchTerm = $request->input('search');
-    $locationFilter = $request->input('location');
-    
-    // Add these two lines to fetch the live counts
+{
     $productsCount = Product::count();
-    $vendorCount = Vendor::count(); // Or Store::count() depending on your model name
+    $vendorCount = Vendor::count();
 
-    // Pass them into the view compact array
-    return view('search', compact('productsCount', 'vendorCount', 'searchTerm', 'locationFilter' /* plus any other variables you already pass */));
-        // 1. Load products with vendors, ensuring we can access pivot data
-        $query = Product::query()
-            ->with(['vendors' => function($q) {
-                // Eager load the latest history for each vendor to display price changes
-                $q->with(['products' => function($sq) {
-                    $sq->with('priceHistories');
-                }]);
-            }])
-            ->withCount('ratings')
-            ->withAvg('ratings', 'rating');
+    // 1. Fetch products with relationships
+    $query = Product::query()
+        ->with(['vendors' => function($q) {
+            $q->with(['products' => function($sq) {
+                $sq->with('priceHistories');
+            }]);
+        }])
+        ->withCount('ratings')
+        ->withAvg('ratings', 'rating');
 
-        if ($request->filled('query')) {
-            $query->where('name', 'like', '%' . $request->query . '%');
-        }
-
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
-
-        if (!$request->filled('query') && !$request->filled('category')) {
-            $query->inRandomOrder();
-        } else {
-            $query->latest();
-        }
-
-        $products = $query->paginate(12);
-
-        return view('product.search', [
-            'products' => $products,
-            'searchTerm' => $request->query('query'),
-            'selectedCategory' => $request->category,
-        ]);
+    // 2. Apply filters if active
+    if ($request->filled('query')) {
+        $query->where('name', 'like', '%' . $request->query('query') . '%');
     }
 
+    if ($request->filled('category')) {
+        $query->where('category', $request->category);
+    }
+
+    // 3. If no filter, get all to shuffle randomly via PHP collection
+    if (!$request->filled('query') && !$request->filled('category')) {
+        $allProducts = $query->get()->shuffle(); // This guarantees a true shuffle every single refresh!
+        
+        // Manually paginate the shuffled collection
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 12;
+        $currentItems = $allProducts->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+        $products = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentItems, 
+            $allProducts->count(), 
+            $perPage, 
+            $currentPage, 
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+    } else {
+        $products = $query->latest()->paginate(12);
+    }
+
+    return view('search', [
+        'products' => $products,
+        'productsCount' => $productsCount,
+        'vendorCount' => $vendorCount,
+        'searchTerm' => $request->query('query'),
+        'selectedCategory' => $request->category,
+    ]);
+}
     public function show($id)
     {
         // Load product with its vendors and their specific price history
