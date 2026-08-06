@@ -147,7 +147,11 @@
         <a href="{{ route('product.search') }}" class="text-sm font-bold hover:text-amber-400 transition">All Items</a>
         <!-- <a href="#" class="text-sm font-bold hover:text-amber-400 transition">Flights</a>
         <a href="#" class="text-sm font-bold hover:text-amber-400 transition">Buses</a> -->
-        <a href="#" class="text-sm font-bold hover:text-amber-400 transition">Top Deals</a>
+        <a href="{{ route('product.search', ['deal' => 'true']) }}" 
+   class="text-sm font-bold hover:text-amber-400 transition {{ request('deal') == 'true' ? 'text-amber-400' : 'hover:text-amber-400' }}">
+   Top Deals
+</a>
+        
     </div>
 
     <!-- Mega Menu Overlay (Wide Layout) -->
@@ -229,7 +233,7 @@
     <!-- ===== FEATURED PRODUCTS & TRIPS ===== -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h2 class="text-xl font-semibold text-gray-800 mb-6">
-        {{ $searchTerm || $locationFilter ? 'Showing results for: ' . ($searchTerm ?: 'All Items') : 'All Market Items' }}
+        {{ $searchTerm || $locationFilter ? 'Available vendors for: ' . ($searchTerm ?: 'All Items') : 'All Market Items' }}
     </h2>
 
 
