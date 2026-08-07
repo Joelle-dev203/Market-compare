@@ -9,24 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
-{
-    // Modify the existing table instead of trying to recreate it
-    Schema::table('ratings', function (Blueprint $table) {
-        if (!Schema::hasColumn('ratings', 'trip_id')) {
+    public function up(): void
+    {
+        Schema::create('ratings', function (Blueprint $table) {
+            $table->id();
+            // Define product_id as nullable from the start
+            $table->unsignedBigInteger('product_id')->nullable();
+            // Add trip_id and foreign constraint
             $table->foreignId('trip_id')->nullable()->after('product_id')->constrained()->cascadeOnDelete();
-        }
-        
-        // Ensure product_id is nullable if it wasn't already
-        $table->unsignedBigInteger('product_id')->nullable()->change();
-    });
-}
+            // Add other standard rating columns you might have (e.g., rating, comment, user_id)
+            $table->timestamps();
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('ratings', function (Blueprint $table) {
-        $table->dropForeign(['trip_id']);
-        $table->dropColumn('trip_id');
-    });
-}
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('ratings');
+    }
 };
