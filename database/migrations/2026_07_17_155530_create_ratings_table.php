@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
-            // Define product_id as nullable from the start
             $table->unsignedBigInteger('product_id')->nullable();
-            // Add trip_id and foreign constraint
-            $table->foreignId('trip_id')->nullable()->after('product_id')->constrained()->cascadeOnDelete();
-            // Add other standard rating columns you might have (e.g., rating, comment, user_id)
+            $table->foreignId('trip_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
