@@ -239,4 +239,13 @@ class TripController extends Controller implements HasMiddleware
 
     return back()->with('success', 'Thank you for your trip rating!');
 }
+public function rate(Request $request, $id)
+{
+    // Add your rating logic here, for example:
+    $trip = Trip::findOrFail($id);
+    
+    // Save the rating...
+    
+    return back()->with('success', 'Rating submitted successfully!');
+}
 }
