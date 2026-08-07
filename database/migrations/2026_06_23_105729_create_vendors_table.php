@@ -14,7 +14,7 @@ return new class extends Migration
     Schema::create('vendors', function (Blueprint $table) {
         $table->id();
         $table->string('name'); // Name of the shop (e.g., "Glotelho", "Boutique d'Amadou")
-        $table->string('email')->unique();
+        $table->string('email')->nullable()->unique();
         $table->string('password');
         $table->string('type')->default('local'); // 'scraped' for websites, 'local' for quarter stores
         $table->string('location')->nullable(); // Quarter/City (e.g., "Akwa, Douala", "Mokolo, Yaoundé")
